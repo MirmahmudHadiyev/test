@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="az" >
+<head>
+	
+	<meta charset="utf-8" />
+
+	<title>Matrix Kursları</title>
+
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	
+	<style>
+		.product_img{
+			height: 200px;
+			object-fit: contain;
+		}
+	</style>
+</head>
+<body>
+
+	<div class="container" >
+		<h2>Products</h2>
+		<div class="row product_list">
+
+		</div>
+	</div>
+
+
+	<div class="container mt-5" >
+		<h2>Liked products</h2>
+		<div class="row liked_products">
+
+		</div>
+	</div>
+
+	
+	<script src="js/store.js"></script>
+	<script>
+		const {localStorage}=window;
+		const new_prododuct_list=products.map(row => {
+			let new_price=row.price * 1.7;
+
+			return {
+				id: row.id,
+				title: row.title,
+				price: new_price.toFixed(2),
+				image : row.image
+			}
+
+		} );
+
+		function getProducts(argument) {
+			let card_item='';
+			let product_list=document.getElementsByClassName('product_list');
+			let get_fav_id=JSON.parse(localStorage.getItem('likedProducts'));
+
+
+
+			for(let product of new_prododuct_list){
+
+
+				card_item +=`<div class="card mt-3 mr-1" style="width: 18rem;">
+				  <img class="card-img-top product_img" src="${product.image}" alt="${product.title}"  />
+				  <div class="card-body">
+				    <h5 class="card-title">${product.title}</h5>
+				    <p class="card-text">${product.price}</p>
+			    `;
+
+			    if(get_fav_id.indexOf(product.id) ==-1){
+
+			    	card_item+=`<button type='button' class="btn btn-primary" onclick='addToFavorite(${product.id})' >like</button>`
+			    }else{
+			    	card_item+=`<button type='button' class="btn btn-primary" onclick='removeFromFavorite(${product.id})' >unlike</button>`
+			    }
+
+			    card_item +=`
+				  </div>
+				</div>`;
+			}
+
+			product_list[0].innerHTML=card_item;
+
+		}
+
+
+		getProducts();
+
+
+		let likedProducts=[];
+		function addToFavorite(productId) {
+
+			if (likedProducts.indexOf(productId)==-1) {
+				likedProducts.push(productId);
+			}
+
+
+			localStorage.setItem('likedProducts', JSON.stringify(likedProducts));
+
+			getProducts();
+			getLikedProducts();
+		}
+
+
+		function getLikedProducts(){
+			let get_fav_id=JSON.parse(localStorage.getItem('likedProducts'));
+			let card_item2='';
+			let liked_products=document.getElementsByClassName('liked_products');
+
+			for(let id of get_fav_id){
+				let findProductById=new_prododuct_list.find(row => row.id==id)
+				
+				
+
+				card_item2 +=`<div class="card mt-3 mr-1" style="width: 18rem;">
+				  <img class="card-img-top product_img" src="${findProductById.image}" alt="${findProductById.title}"  />
+				  <div class="card-body">
+				    <h5 class="card-title">${findProductById.title}</h5>
+				    <p class="card-text">${findProductById.price}</p>
+				    <button type='button' class="btn btn-primary" onclick='removeFromFavorite(${findProductById.id})' >unlike</button>
+				  </div>
+				</div>`;
+
+			}
+
+
+			liked_products[0].innerHTML=card_item2;
+		}
+
+
+		function removeFromFavorite(productId) {
+			let get_fav_id=JSON.parse(localStorage.getItem('likedProducts'));
+			let find_index=get_fav_id.indexOf(productId);
+
+			//console.log(get_fav_id, productId, find_index);
+
+			get_fav_id.splice(find_index, 1);
+
+			localStorage.setItem('likedProducts', JSON.stringify(get_fav_id));
+
+			getProducts();
+			getLikedProducts();
+		}
+
+		window.onload=getLikedProducts;
+		
+
+	</script>
+
+</body>
+</html>
+
